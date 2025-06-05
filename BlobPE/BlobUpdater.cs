@@ -8,7 +8,7 @@ namespace BlobPE
         /// <summary>
         /// This should be called after the application has been updated and restarted.
         /// </summary>
-        public static void RemoveUpdateFiles()
+        internal static void RemoveUpdateFiles()
         {
             string tempPath = Path.GetTempPath();
             var files = Directory.GetFiles(tempPath, "updateBlobPOC_*.exe");
@@ -29,7 +29,7 @@ namespace BlobPE
         /// Needs to be called at the start of the application.
         /// </summary>
         /// <param name="args"></param>
-        public static void CheckForUpdates(string[] args)
+        internal static void CheckForUpdates(string[] args)
         {
             if (args.Length == 3 && args[0] == "--update")
             {

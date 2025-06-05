@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace BlobPE
 {
-    public class BlobInjector
+    internal class BlobInjector
     {
         private static void InjectBlob(Dictionary<string, string> data)
         {
@@ -22,7 +22,7 @@ namespace BlobPE
             }
         }
 
-        public static void InjectAndRestart(Dictionary<string, string> data)
+        internal static void InjectAndRestart(Dictionary<string, string> data)
         {
             string exePath = Environment.ProcessPath;
             string tempPath = Path.Combine(Path.GetTempPath(), "updateBlobPOC_" + Guid.NewGuid() + ".exe");
