@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea or improvement for BlobPE
 title: "[Feature] "
-labels: Issues - Feature
+labels: enhancement
 assignees: Miiraak
 
 ---
