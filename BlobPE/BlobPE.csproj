@@ -4,6 +4,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>BlobPE</Title>
+    <Authors>Miiraak</Authors>
+    <Description>Lightweight and unconventional. BlobPE is a .NET package that adds embedded key/value persistence to any standalone executable.</Description>
+    <Copyright>© 2025 Miiraak</Copyright>
+    <RepositoryUrl>https://github.com/Miiraak/BlobPE</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>net; csharp; executable; self-modifying; binary; persistence; key-value; embedded-data; standalone; nuget-package</PackageTags>
+	<Version>1.0.0</Version>
+	<FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
 
 </Project>

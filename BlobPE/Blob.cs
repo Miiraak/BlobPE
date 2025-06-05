@@ -68,7 +68,7 @@
         public static void CreateBlob(Dictionary<string, string> dict)
         {
             if (_data == null)
-                BlobInjector.InjectAndRestart(dict); 
+                BlobInjector.InjectAndRestart(dict);
         }
     }
 }
