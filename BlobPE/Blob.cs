@@ -10,6 +10,33 @@
         }
 
         /// <summary>
+        /// Creates the BLOB section in the executable if it does not exist.
+        /// </summary>
+        public static void CreateBlob(Dictionary<string, string> dict)
+        {
+            if (_data == null)
+                BlobInjector.InjectAndRestart(dict);
+        }
+
+        /// <summary>
+        /// Verifies if the executable is started as an updater and applies the update if so.
+        /// </summary>
+        /// <param name="args"></param>
+        public static void CheckForUpdates(string[] args)
+        {
+            BlobUpdater.CheckForUpdates(args);
+        }
+
+        /// <summary>
+        /// Uses this method to remove the update files after the application has been updated and restarted.
+        /// If you do not call this method, the update files will remain in the temporary directory.
+        /// </summary>
+        public static void RemoveUpdateFiles()
+        {
+            BlobUpdater.RemoveUpdateFiles();
+        }
+
+        /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="key"></param>
@@ -60,15 +87,6 @@
         public static void Save()
         {
             BlobUpdater.UpdateAndRestart(_data);
-        }
-
-        /// <summary>
-        /// Creates the BLOB section in the executable if it does not exist.
-        /// </summary>
-        public static void CreateBlob(Dictionary<string, string> dict)
-        {
-            if (_data == null)
-                BlobInjector.InjectAndRestart(dict);
         }
     }
 }
