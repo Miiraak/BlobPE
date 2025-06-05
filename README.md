@@ -1,4 +1,4 @@
-# BlobPE
+# BlobPE  [![CodeQL](https://github.com/Miiraak/BlobPE/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Miiraak/BlobPE/actions/workflows/github-code-scanning/codeql)
 
 ## Description
 
