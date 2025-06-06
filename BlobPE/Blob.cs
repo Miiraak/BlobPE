@@ -1,25 +1,30 @@
 ﻿namespace BlobPE
 {
+    /// <summary>
+    /// Provides methods for managing key-value data stored in a blob, as well as handling application updates.
+    /// </summary>
+    /// <remarks>The <see cref="Blob"/> class offers functionality to retrieve, modify, and persist key-value
+    /// pairs stored in a blob. It also includes methods for managing application updates, such as checking for updates,
+    /// removing update files, and saving updated settings. This class is designed to be used as a static utility and is
+    /// initialized automatically when accessed.</remarks>
     public class Blob
     {
         private static readonly Dictionary<string, string> _data;
 
+        /// <summary>
+        /// Initializes static members of the <see cref="Blob"/> class by loading data from the blob store.
+        /// </summary>
+        /// <remarks>This static constructor is invoked automatically before any static members of the
+        /// <see cref="Blob"/> class are accessed. It ensures that the blob data is loaded from the underlying storage
+        /// at the time of class initialization.</remarks>
         static Blob()
         {
             _data = BlobStore.Read();
         }
 
         /// <summary>
-        /// Creates the BLOB section in the executable if it does not exist.
-        /// </summary>
-        public static void CreateBlob(Dictionary<string, string> dict)
-        {
-            if (_data == null)
-                BlobInjector.InjectAndRestart(dict);
-        }
-
-        /// <summary>
         /// Verifies if the executable is started as an updater and applies the update if so.
+        /// Needs to be called at the start of the application. In Program.cs at the beginning of the Main method.
         /// </summary>
         /// <param name="args"></param>
         public static void CheckForUpdates(string[] args)
@@ -82,11 +87,11 @@
         }
 
         /// <summary>
-        /// Saves the current settings to the executable's BLOB section.
+        /// Saves the current settings to the executable's BLOB section and restarts the application.
         /// </summary>
         public static void Save()
         {
-            BlobUpdater.UpdateAndRestart(_data);
+            BlobUpdater.StartUpdateFile(_data);
         }
     }
 }
