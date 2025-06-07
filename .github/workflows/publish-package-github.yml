@@ -1,4 +1,4 @@
-name: Build & Publish NuGet Package (Manual Only/Main, GitHub Only)
+name: Build & Publish BlobPE to GitHub Packages (Manual Only/Main)
 
 on:
   workflow_dispatch:
@@ -31,3 +31,20 @@ jobs:
           dotnet nuget push "./nupkg/*.nupkg" \
             --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
             --api-key ${{ secrets.PACKAGE_TOKEN_GITHUB }}
+
+      - name: Verify BlobPE publication on GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN_GITHUB }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          VERSION=$(ls ./nupkg/BlobPE.*.nupkg | grep -oP '\d+\.\d+\.\d+' | head -1)
+          echo "Vérification de BlobPE version $VERSION sur GitHub Packages pour $OWNER"
+          sleep 15 # Attendre l'indexation côté GitHub
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/users/$OWNER/packages/nuget/BlobPE/versions")
+          if echo "$RESPONSE" | grep -q "\"name\": \"$VERSION\""; then
+            echo "BlobPE $VERSION trouvé sur GitHub Packages !"
+          else
+            echo "BlobPE $VERSION introuvable sur GitHub Packages !"
+            exit 1
+          fi
