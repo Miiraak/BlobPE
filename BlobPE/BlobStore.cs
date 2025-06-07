@@ -74,8 +74,9 @@ namespace BlobPE
         /// no existing blob is found, a new JSON blob is appended to the end of the file. </para></remarks>
         /// <param name="exePath">The path to the executable file to be modified. Must not be null or empty.</param>
         /// <param name="data">A dictionary containing the key-value pairs to be serialized into the JSON blob.</param>
+        /// <param name="defaultData">A dictionary containing default data to be used when creating a new blob if no existing blob is found.</param>
         /// <exception cref="Exception">Thrown if the new JSON blob exceeds the size of the existing blob in the file.</exception>
-        internal static void Write(string exePath, Dictionary<string, string> data)
+        internal static void Write(string exePath, Dictionary<string, string> data, Dictionary<string, int> defaultData)
         {
             byte[] fileBytes = File.ReadAllBytes(exePath);
 
@@ -84,14 +85,31 @@ namespace BlobPE
 
             if (startIndex == -1 || endIndex == -1)
             {
-                string newIfJson = JsonSerializer.Serialize(data);
-                string newBlob = $"[BLOB_START]{newIfJson}[BLOB_END]";
+                // If no existing blob is found, append a new one
+                // Create a new Json blob with default sized data
+                if (defaultData == null || defaultData.Count == 0)
+                    throw new ArgumentException("Default data cannot be null or empty when creating a new blob.");
+
+                Dictionary<string, string> defaultBlobData = new Dictionary<string, string>();
+                foreach (var kvp in defaultData)
+                {
+                    if (kvp.Value <= 0)
+                        throw new ArgumentException($"Field size for '{kvp.Key}' must be greater than zero.");
+
+                    defaultBlobData[kvp.Key] = new string(' ', kvp.Value);
+                }
+
+                string json = JsonSerializer.Serialize(defaultBlobData);
+                string blob = $"[BLOB_START]{json}[BLOB_END]";
                 using (var stream = new FileStream(exePath, FileMode.Append, FileAccess.Write, FileShare.None))
                 {
-                    byte[] blobBytes = Encoding.UTF8.GetBytes(newBlob);
+                    byte[] blobBytes = Encoding.UTF8.GetBytes(blob);
                     stream.Write(blobBytes, 0, blobBytes.Length);
                 }
-                return;
+
+                fileBytes = File.ReadAllBytes(exePath);
+                startIndex = FindSequence(fileBytes, StartTagBytes);
+                endIndex = FindSequence(fileBytes, EndTagBytes, startIndex + StartTagBytes.Length);
             }
 
             int jsonStart = startIndex + StartTagBytes.Length;

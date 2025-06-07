@@ -19,11 +19,12 @@ namespace BlobPE
         /// method applies the update using the subsequent two  arguments as parameters.</remarks>
         /// <param name="args">An array of command-line arguments. The first argument must be <c>--update</c>,  followed by two additional
         /// arguments specifying the update parameters.</param>
-        internal static void CheckForUpdates(string[] args)
+        /// <param name="defaultData">A dictionary containing default data to be used once during the blob creation process.</param>
+        internal static void CheckForUpdates(string[] args, Dictionary<string, int> defaultData)
         {
             if (args.Length == 3 && args[0] == "--update")
             {
-                ApplyUpdate(args[1], args[2]);
+                ApplyUpdate(args[1], args[2], defaultData);
                 return;
             }
         }
@@ -37,13 +38,14 @@ namespace BlobPE
         /// <param name="targetPath">The file path where the update will be applied. This must be a valid, writable path.</param>
         /// <param name="jsonData">A JSON-formatted string containing the update data. The string must represent a dictionary of key-value
         /// pairs.</param>
-        private static void ApplyUpdate(string targetPath, string jsonData)
+        /// <param name="defaultData">A dictionary containing default data to be used during the blob creation process.</param>
+        private static void ApplyUpdate(string targetPath, string jsonData, Dictionary<string, int> defaultData)
         {
             while (IsLocked(targetPath))
                 Thread.Sleep(100);
 
             var data = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonData);
-            BlobStore.Write(targetPath, data);
+            BlobStore.Write(targetPath, data, defaultData);
             Process.Start(targetPath);
             Environment.Exit(0);
         }
