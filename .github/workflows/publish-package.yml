@@ -1,12 +1,12 @@
 name: Build & Publish NuGet Package (Manual Only/Main)
 
 on:
-  workflow_dispatch: # Jamais automatique
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # S'assure que c'est sur main
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout repository
@@ -15,7 +15,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # Mets ici la version cible si besoin
+          dotnet-version: '8.0.x'
 
       - name: Restore dependencies
         run: dotnet restore
@@ -26,14 +26,48 @@ jobs:
       - name: Pack NuGet package
         run: dotnet pack --configuration Release --no-build --output ./nupkg
 
+      - name: Extract BlobPE version
+        id: get_version
+        run: |
+          VERSION=$(ls ./nupkg/BlobPE.*.nupkg | grep -oP '\d+\.\d+\.\d+' | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Publish to GitHub Packages
         run: |
-          dotnet nuget push "./nupkg/*.nupkg" \
+          dotnet nuget push "./nupkg/BlobPE.*.nupkg" \
             --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
             --api-key ${{ secrets.PACKAGE_TOKEN_GITHUB }}
 
+      - name: Verify BlobPE publication on GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN_GITHUB }}
+          OWNER: ${{ github.repository_owner }}
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          echo "Vérification de BlobPE version $VERSION sur GitHub Packages pour $OWNER"
+          sleep 15
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/users/$OWNER/packages/nuget/BlobPE/versions")
+          if echo "$RESPONSE" | grep -q "\"name\": \"$VERSION\""; then
+            echo "BlobPE $VERSION trouvé sur GitHub Packages !"
+          else
+            echo "BlobPE $VERSION introuvable sur GitHub Packages !"
+            exit 1
+          fi
+
       - name: Publish to NuGet.org
         run: |
-          dotnet nuget push "./nupkg/*.nupkg" \
+          dotnet nuget push "./nupkg/BlobPE.*.nupkg" \
             --source "https://api.nuget.org/v3/index.json" \
             --api-key ${{ secrets.PACKAGE_TOKEN_NUGET }}
+
+      - name: Verify NuGet.org publication
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          PACKAGE_ID="BlobPE"
+          echo "Checking $PACKAGE_ID $VERSION on NuGet.org"
+          sleep 10
+          curl -sL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" | grep -q "\"$VERSION\"" \
+            && echo "Package found!" \
+            || (echo "Package NOT found!" && exit 1)
