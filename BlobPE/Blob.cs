@@ -54,8 +54,8 @@
         /// store.</returns>
         public static string Get(string key)
         {
-            _data.TryGetValue(key, out var value);
-            return value.ToString();
+            _data.TryGetValue(key, out string value);
+            return value;
         }
 
         /// <summary>
