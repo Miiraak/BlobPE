@@ -102,7 +102,34 @@
         /// class. Ensure that the data to be saved is properly prepared before calling this method.</remarks>
         public static void Save()
         {
-            BlobUpdater.StartUpdateFile(_data);
+            BlobUpdater.UpdateRestart(_data);
+        }
+
+        /// <summary>
+        /// Resets the contents of all blobs in the data store to empty strings of the same length.
+        /// </summary>
+        /// <remarks>This method iterates through all keys in the data store and replaces the content of
+        /// each blob  with a string of spaces, preserving the original length of the blob. After resetting the blobs, 
+        /// the updated data is saved using the <see cref="BlobUpdater.UpdateFile"/> method.</remarks>
+        public static void Reset()
+        {
+            foreach (var key in _data.Keys.ToList())
+            {
+                int lenght = _data[key].Length;
+                _data[key] = new string(' ', lenght);
+            }
+
+            BlobUpdater.UpdateRestart(_data);
+        }
+
+        /// <summary>
+        /// Deletes the current blob from the blob store.
+        /// </summary>
+        /// <remarks>This method removes the blob associated with the current context from the underlying
+        /// blob store. Ensure that the blob exists before calling this method to avoid unexpected behavior.</remarks>
+        public static void Delete()
+        {
+            BlobUpdater.DeleteRestart();
         }
     }
 }

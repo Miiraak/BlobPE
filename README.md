@@ -1,4 +1,4 @@
-# BlobPE  [![CodeQL](https://github.com/Miiraak/BlobPE/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Miiraak/BlobPE/actions/workflows/github-code-scanning/codeql) [![Published](https://github.com/Miiraak/BlobPE/actions/workflows/publish-package.yml/badge.svg)](https://github.com/Miiraak/BlobPE/actions/workflows/publish-package.yml)
+# BlobPE [![CodeQL](https://github.com/Miiraak/BlobPE/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Miiraak/BlobPE/actions/workflows/github-code-scanning/codeql) [![Published](https://github.com/Miiraak/BlobPE/actions/workflows/publish-package.yml/badge.svg)](https://github.com/Miiraak/BlobPE/actions/workflows/publish-package.yml)
 
 ## Description
 **BlobPE** is a lightweight and experimental .NET (C#) library that enables standalone applications to persist structured data directly within their own executable files. By injecting a compact blob (typically JSON) into the binary, BlobPE allows applications to store and modify internal key/value data without relying on external files or configurations.
@@ -15,6 +15,9 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 - Automatic padding and blob size enforcement to ensure binary integrity.
 - No need for external configuration or storage files.
 - Automatic injection of blob headers.
+- Simple reset of the blob values to their dafault size (only space padding).
+- Supports basic data types: string, int, bool, and object serialization.
+- Blob removal and clearing functionality.
 
 ### Features in Development
 |||
@@ -38,13 +41,15 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 | **GetInt(string key)** | Retrieves a value as integer from the blob data by its key. |
 | **Set(string key, object value)** | Sets the value for a specified key in the blob data. |
 | **Save()** | Saves the current state of the app data back into his own executable file. |
+| **Clear()** | Clears the blob data, removing all value, keeping the key and size value. |
+| **Delete()** | Deletes the blob data from the executable file, removing all traces of the stored data. |
 
 > You can find a simple options setting save application example at [BlobPOC](https://github.com/Miiraak/BlobPOC).
 
 ## Contributing
 Contributions are welcome! To contribute to this project:
 
-1. Fork the repository.S
+1. Fork the repository.
 2. Create a new branch (`git checkout -b my-feature`).
 3. Make your changes.
 4. Commit (`git commit -m 'Add my feature'`).
