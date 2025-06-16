@@ -161,5 +161,30 @@ namespace BlobPE
             }
             return -1;
         }
+
+        /// <summary>
+        /// Deletes a specific blob of data from the specified executable file.
+        /// </summary>
+        /// <remarks>This method identifies and removes a blob of data located between predefined start
+        /// and end tags  within the specified file. If the tags are not found, the file remains unchanged.</remarks>
+        /// <param name="exePath">The full path to the executable file from which the blob will be removed.  The file must exist and be
+        /// accessible.</param>
+        internal static void DeleteBlob(string exePath)
+        {
+            // Remove from to the end of the file
+            byte[] fileBytes = File.ReadAllBytes(exePath);
+            int startIndex = FindSequence(fileBytes, StartTagBytes);
+            if (startIndex != -1)
+            {
+                int endIndex = FindSequence(fileBytes, EndTagBytes, startIndex + StartTagBytes.Length);
+                if (endIndex != -1)
+                {
+                    // Create a new file without the blob
+                    byte[] newFileBytes = new byte[startIndex];
+                    Array.Copy(fileBytes, 0, newFileBytes, 0, startIndex);
+                    File.WriteAllBytes(exePath, newFileBytes);
+                }
+            }
+        }
     }
 }

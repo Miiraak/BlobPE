@@ -27,6 +27,12 @@ namespace BlobPE
                 ApplyUpdate(args[1], args[2], defaultData);
                 return;
             }
+
+            if (args.Length == 2 && args[0] == "--delete")
+            {
+                ApplyDelete(args[1]);
+                return;
+            }
         }
 
         /// <summary>
@@ -46,6 +52,16 @@ namespace BlobPE
 
             var data = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonData);
             BlobStore.Write(targetPath, data, defaultData);
+            Process.Start(targetPath);
+            Environment.Exit(0);
+        }
+
+        private static void ApplyDelete(string targetPath)
+        {
+            while (IsLocked(targetPath))
+                Thread.Sleep(100);
+
+            BlobStore.DeleteBlob(targetPath);
             Process.Start(targetPath);
             Environment.Exit(0);
         }
@@ -79,7 +95,7 @@ namespace BlobPE
         /// perform the update.  The current process will terminate after invoking the update process.</remarks>
         /// <param name="updatedData">A dictionary containing key-value pairs of data to be used during the update process.  Keys and values must
         /// be serializable to JSON.</param>
-        internal static void StartUpdateFile(Dictionary<string, string> updatedData)
+        internal static void UpdateRestart(Dictionary<string, string> updatedData)
         {
             string exePath = Environment.ProcessPath;
             string tempPath = Path.Combine(Path.GetTempPath(), "updateBlobPOC_" + Guid.NewGuid() + ".exe");
@@ -87,6 +103,23 @@ namespace BlobPE
             File.Copy(exePath, tempPath, true);
             string payload = JsonSerializer.Serialize(updatedData);
             Process.Start(tempPath, $"--update \"{exePath}\" \"{payload.Replace("\"", "\\\"")}\"");
+            Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// Initiates a restart process by creating a temporary copy of the current executable,  launching it with a
+        /// delete command, and then exiting the current process.
+        /// </summary>
+        /// <remarks>This method creates a temporary copy of the current executable in the system's
+        /// temporary directory  and starts it with a command to delete the original executable. The current process is
+        /// then terminated. The temporary executable is responsible for completing the deletion process.</remarks>
+        internal static void DeleteRestart()
+        {
+            string exePath = Environment.ProcessPath;
+            string tempPath = Path.Combine(Path.GetTempPath(), "updateBlobPOC_" + Guid.NewGuid() + ".exe");
+
+            File.Copy(exePath, tempPath, true);
+            Process.Start(tempPath, $"--delete \"{exePath}\"");
             Environment.Exit(0);
         }
 
