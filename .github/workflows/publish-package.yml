@@ -35,42 +35,109 @@ jobs:
           VERSION=$(ls ./nupkg/BlobPE.*.nupkg | grep -oP '\d+\.\d+\.\d+' | head -1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Publish to GitHub Packages
-        run: |
-          dotnet nuget push "./nupkg/BlobPE.*.nupkg" \
-            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            --api-key ${{ secrets.PACKAGE_TOKEN_GITHUB }}
-
-      - name: Verify BlobPE publication on GitHub Packages
+      # Vérifier si la version existe déjà sur GitHub Packages
+      - name: Check if version exists on GitHub Packages
+        id: check_gh_pkg
         env:
           GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN_GITHUB }}
           OWNER: ${{ github.repository_owner }}
           VERSION: ${{ steps.get_version.outputs.version }}
         run: |
-          echo "Vérification de BlobPE version $VERSION sur GitHub Packages pour $OWNER"
-          sleep 15
           RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
             "https://api.github.com/users/$OWNER/packages/nuget/BlobPE/versions")
           if echo "$RESPONSE" | grep -q "\"name\": \"$VERSION\""; then
-            echo "BlobPE $VERSION trouvé sur GitHub Packages !"
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            echo "BlobPE $VERSION introuvable sur GitHub Packages !"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Vérifier si la version existe déjà sur NuGet.org
+      - name: Check if version exists on NuGet.org
+        id: check_nuget
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          PACKAGE_ID="BlobPE"
+          PACKAGE_ID_LC=$(echo "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')
+          if curl -sL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID_LC}/index.json" | grep -q "\"$VERSION\""; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Si la version existe déjà sur les deux plateformes, on arrête le job
+      - name: Skip if already published everywhere
+        if: steps.check_gh_pkg.outputs.exists == 'true' && steps.check_nuget.outputs.exists == 'true'
+        run: |
+          echo "Package ${{ steps.get_version.outputs.version }} is already published on both GitHub Packages and NuGet.org. Skipping publish."
+          exit 0
+
+      # Publier sur GitHub Packages si manquant
+      - name: Publish to GitHub Packages
+        if: steps.check_gh_pkg.outputs.exists != 'true'
+        run: |
+          dotnet nuget push "./nupkg/BlobPE.*.nupkg" \
+            --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            --api-key ${{ secrets.PACKAGE_TOKEN_GITHUB }}
+
+      # Vérifier publication GitHub Packages (si on a publié)
+      - name: Verify BlobPE publication on GitHub Packages
+        if: steps.check_gh_pkg.outputs.exists != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN_GITHUB }}
+          OWNER: ${{ github.repository_owner }}
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          ATTEMPTS=12
+          DELAY=10
+          FOUND=0
+          for i in $(seq 1 $ATTEMPTS); do
+            echo "Attempt $i: Checking BlobPE $VERSION on GitHub Packages..."
+            RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+              "https://api.github.com/users/$OWNER/packages/nuget/BlobPE/versions")
+            if echo "$RESPONSE" | grep -q "\"name\": \"$VERSION\""; then
+              echo "BlobPE $VERSION found on GitHub Packages!"
+              FOUND=1
+              break
+            fi
+            echo "Not found yet. Waiting $DELAY seconds..."
+            sleep $DELAY
+          done
+          if [ $FOUND -eq 0 ]; then
+            echo "BlobPE $VERSION NOT found on GitHub Packages after $((ATTEMPTS*DELAY)) seconds!"
             exit 1
           fi
 
+      # Publier sur NuGet.org si manquant
       - name: Publish to NuGet.org
+        if: steps.check_nuget.outputs.exists != 'true'
         run: |
           dotnet nuget push "./nupkg/BlobPE.*.nupkg" \
             --source "https://api.nuget.org/v3/index.json" \
             --api-key ${{ secrets.PACKAGE_TOKEN_NUGET }}
 
+      # Vérifier publication NuGet.org (si on a publié)
       - name: Verify NuGet.org publication
+        if: steps.check_nuget.outputs.exists != 'true'
         env:
           VERSION: ${{ steps.get_version.outputs.version }}
         run: |
           PACKAGE_ID="BlobPE"
-          echo "Checking $PACKAGE_ID $VERSION on NuGet.org"
-          sleep 10
-          curl -sL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" | grep -q "\"$VERSION\"" \
-            && echo "Package found!" \
-            || (echo "Package NOT found!" && exit 1)
+          PACKAGE_ID_LC=$(echo "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')
+          ATTEMPTS=12
+          DELAY=10
+          FOUND=0
+          for i in $(seq 1 $ATTEMPTS); do
+            echo "Attempt $i: Checking $PACKAGE_ID $VERSION on NuGet.org..."
+            if curl -sL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID_LC}/index.json" | grep -q "\"$VERSION\""; then
+              echo "Package found!"
+              FOUND=1
+              break
+            fi
+            echo "Not found yet. Waiting $DELAY seconds..."
+            sleep $DELAY
+          done
+          if [ $FOUND -eq 0 ]; then
+            echo "Package NOT found after $((ATTEMPTS*DELAY)) seconds!"
+            exit 1
+          fi
