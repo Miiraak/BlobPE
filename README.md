@@ -7,6 +7,10 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 
 > Warning ⚠️: BlobPE uses a non-standard approach to binary self-modification. It is not recommended for production environments, but rather for educational, exploratory, or controlled scenarios.
 
+## Builds :
+- .NET 8.0
+- .NET Standard 2.0
+
 ## Features
 - Inject structured data (JSON format) directly into the application's binary.
 - Read and update key/value pairs embedded in the executable.
