@@ -1,5 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text.Json;
+using System.Threading;
 
 namespace BlobPE
 {
@@ -97,13 +101,13 @@ namespace BlobPE
         /// be serializable to JSON.</param>
         internal static void UpdateRestart(Dictionary<string, string> updatedData)
         {
-            string exePath = Environment.ProcessPath;
+            string exePath = Process.GetCurrentProcess().MainModule.FileName;
             string tempPath = Path.Combine(Path.GetTempPath(), "updateBlobPOC_" + Guid.NewGuid() + ".exe");
 
             File.Copy(exePath, tempPath, true);
             string payload = JsonSerializer.Serialize(updatedData);
             Process.Start(tempPath, $"--update \"{exePath}\" \"{payload.Replace("\"", "\\\"")}\"");
-            Environment.Exit(0);
+            System.Environment.Exit(0);
         }
 
         /// <summary>
@@ -115,12 +119,12 @@ namespace BlobPE
         /// then terminated. The temporary executable is responsible for completing the deletion process.</remarks>
         internal static void DeleteRestart()
         {
-            string exePath = Environment.ProcessPath;
+            string exePath = Process.GetCurrentProcess().MainModule.FileName;
             string tempPath = Path.Combine(Path.GetTempPath(), "updateBlobPOC_" + Guid.NewGuid() + ".exe");
 
             File.Copy(exePath, tempPath, true);
             Process.Start(tempPath, $"--delete \"{exePath}\"");
-            Environment.Exit(0);
+            System.Environment.Exit(0);
         }
 
         /// <summary>
