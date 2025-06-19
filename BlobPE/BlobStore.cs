@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace BlobPE
@@ -35,7 +39,7 @@ namespace BlobPE
         /// found.</returns>
         internal static Dictionary<string, string> Read()
         {
-            string exePath = Environment.ProcessPath;
+            string exePath = Process.GetCurrentProcess().MainModule.FileName;
             byte[] fileBytes = File.ReadAllBytes(exePath);
 
             int startIndex = FindSequence(fileBytes, StartTagBytes);

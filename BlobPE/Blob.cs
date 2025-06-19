@@ -1,4 +1,7 @@
-﻿namespace BlobPE
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace BlobPE
 {
     /// <summary>
     /// Provides methods for managing key-value data stored in a blob, as well as handling application updates.

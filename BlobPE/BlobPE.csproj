@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+	<LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>BlobPE</Title>
@@ -12,8 +13,8 @@
     <RepositoryUrl>https://github.com/Miiraak/BlobPE</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>net; csharp; executable; self-modifying; binary; persistence; key-value; embedded-data; standalone; nuget-package</PackageTags>
-	<Version>1.1.0</Version>
-	<FileVersion>1.1.0</FileVersion>
+	<Version>1.1.1</Version>
+	<FileVersion>1.1.1</FileVersion>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -29,6 +30,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.6" />
   </ItemGroup>
 
 </Project>
