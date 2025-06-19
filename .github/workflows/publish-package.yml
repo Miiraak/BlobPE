@@ -88,8 +88,8 @@ jobs:
           OWNER: ${{ github.repository_owner }}
           VERSION: ${{ steps.get_version.outputs.version }}
         run: |
-          ATTEMPTS=12
-          DELAY=10
+          ATTEMPTS=30
+          DELAY=20
           FOUND=0
           for i in $(seq 1 $ATTEMPTS); do
             echo "Attempt $i: Checking BlobPE $VERSION on GitHub Packages..."
@@ -124,8 +124,8 @@ jobs:
         run: |
           PACKAGE_ID="BlobPE"
           PACKAGE_ID_LC=$(echo "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')
-          ATTEMPTS=12
-          DELAY=10
+          ATTEMPTS=30
+          DELAY=20
           FOUND=0
           for i in $(seq 1 $ATTEMPTS); do
             echo "Attempt $i: Checking $PACKAGE_ID $VERSION on NuGet.org..."
