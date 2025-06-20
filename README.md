@@ -48,7 +48,7 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 | [**Reset()**](https://github.com/Miiraak/BlobPOC/blob/88bdbdb995f66c7204c76438c2abbf7b187f6e64/BlobPOC/MainForm.cs#L56) | Clears the blob data, removing all value, keeping the key and size value. |
 | [**Delete()**](https://github.com/Miiraak/BlobPOC/blob/88bdbdb995f66c7204c76438c2abbf7b187f6e64/BlobPOC/MainForm.cs#L61) | Deletes the blob data from the executable file, removing all traces of the stored data. |
 
-> You can find a simple options setting save application example at [BlobPOC](https://github.com/Miiraak/BlobPOC).
+> You can find an example for saving parameters from an application at [BlobPOC](https://github.com/Miiraak/BlobPOC).
 
 ## Contributing
 Contributions are welcome! To contribute to this project:
