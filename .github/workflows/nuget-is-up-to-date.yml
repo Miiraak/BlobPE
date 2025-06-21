@@ -1,0 +1,69 @@
+name: Nuget is Up-To-Date ?
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  check-up-to-date:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4c
+
+      - name: Extract version from BlobPE.csproj
+        id: get_version
+        run: |
+          VERSION=$(grep -m1 '<Version>' BlobPE.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if version exists on GitHub Packages
+        id: check_gh_pkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_TOKEN_GITHUB }}
+          OWNER: ${{ github.repository_owner }}
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/users/$OWNER/packages/nuget/BlobPE/versions")
+          if echo "$RESPONSE" | grep -q "\"name\": \"$VERSION\""; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if version exists on NuGet.org
+        id: check_nuget
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          PACKAGE_ID="BlobPE"
+          PACKAGE_ID_LC=$(echo "$PACKAGE_ID" | tr '[:upper:]' '[:lower:]')
+          if curl -sL "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID_LC}/index.json" | grep -q "\"$VERSION\""; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail if missing on GitHub Packages
+        if: steps.check_gh_pkg.outputs.exists != 'true'
+        run: |
+          echo "❌ La version ${{ steps.get_version.outputs.version }} n'est PAS publiée sur GitHub Packages !"
+          exit 1
+
+      - name: Fail if missing on NuGet.org
+        if: steps.check_nuget.outputs.exists != 'true'
+        run: |
+          echo "❌ La version ${{ steps.get_version.outputs.version }} n'est PAS publiée sur NuGet.org !"
+          exit 1
+
+      - name: Success check
+        if: steps.check_gh_pkg.outputs.exists == 'true' && steps.check_nuget.outputs.exists == 'true'
+        run: |
+          echo "✅ La version ${{ steps.get_version.outputs.version }} est bien publiée sur GitHub Packages ET NuGet.org"
