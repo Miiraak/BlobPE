@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4c
+        uses: actions/checkout@v4
 
       - name: Extract version from BlobPE.csproj
         id: get_version
@@ -54,16 +54,16 @@ jobs:
       - name: Fail if missing on GitHub Packages
         if: steps.check_gh_pkg.outputs.exists != 'true'
         run: |
-          echo "❌ La version ${{ steps.get_version.outputs.version }} n'est PAS publiée sur GitHub Packages !"
+          echo "La version ${{ steps.get_version.outputs.version }} n'est PAS publiée sur GitHub Packages !"
           exit 1
 
       - name: Fail if missing on NuGet.org
         if: steps.check_nuget.outputs.exists != 'true'
         run: |
-          echo "❌ La version ${{ steps.get_version.outputs.version }} n'est PAS publiée sur NuGet.org !"
+          echo "La version ${{ steps.get_version.outputs.version }} n'est PAS publiée sur NuGet.org !"
           exit 1
 
       - name: Success check
         if: steps.check_gh_pkg.outputs.exists == 'true' && steps.check_nuget.outputs.exists == 'true'
         run: |
-          echo "✅ La version ${{ steps.get_version.outputs.version }} est bien publiée sur GitHub Packages ET NuGet.org"
+          echo "La version ${{ steps.get_version.outputs.version }} est bien publiée sur GitHub Packages ET NuGet.org"
