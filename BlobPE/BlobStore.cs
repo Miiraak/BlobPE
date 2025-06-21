@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace BlobPE
 {
@@ -60,7 +60,7 @@ namespace BlobPE
 
             try
             {
-                var data = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 return data ?? new Dictionary<string, string>();
             }
             catch
@@ -103,7 +103,7 @@ namespace BlobPE
                     defaultBlobData[kvp.Key] = new string(' ', kvp.Value);
                 }
 
-                string json = JsonSerializer.Serialize(defaultBlobData);
+                string json = JsonConvert.SerializeObject(defaultBlobData);
                 string blob = $"[BLOB_START]{json}[BLOB_END]";
                 using (var stream = new FileStream(exePath, FileMode.Append, FileAccess.Write, FileShare.None))
                 {
@@ -119,7 +119,7 @@ namespace BlobPE
             int jsonStart = startIndex + StartTagBytes.Length;
             int jsonLength = endIndex - jsonStart;
 
-            string newJson = JsonSerializer.Serialize(data);
+            string newJson = JsonConvert.SerializeObject(data);
             byte[] newJsonBytes = Encoding.UTF8.GetBytes(newJson);
 
             if (newJsonBytes.Length > jsonLength)
