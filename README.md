@@ -54,7 +54,7 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 > You can find a simple options setting save application example at [BlobPOC](https://github.com/Miiraak/BlobPOC).
 
 ## Internal mechanics
-[!img](https://github.com/Miiraak/BlobPE/blob/master/.github/img/Internal_Interaction.png)
+![img](https://github.com/Miiraak/BlobPE/blob/master/.github/img/Internal_Interaction.png)
 > Can probably be clearer or better, but give you a little idea of the workflow. 
 
 ## Contributing
