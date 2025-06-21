@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Threading;
 
 namespace BlobPE
@@ -54,7 +54,7 @@ namespace BlobPE
             while (IsLocked(targetPath))
                 Thread.Sleep(100);
 
-            var data = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonData);
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonData);
             BlobStore.Write(targetPath, data, defaultData);
             Process.Start(targetPath);
             Environment.Exit(0);
@@ -105,7 +105,7 @@ namespace BlobPE
             string tempPath = Path.Combine(Path.GetTempPath(), "updateBlobPOC_" + Guid.NewGuid() + ".exe");
 
             File.Copy(exePath, tempPath, true);
-            string payload = JsonSerializer.Serialize(updatedData);
+            string payload = JsonConvert.SerializeObject(updatedData);
             Process.Start(tempPath, $"--update \"{exePath}\" \"{payload.Replace("\"", "\\\"")}\"");
             System.Environment.Exit(0);
         }

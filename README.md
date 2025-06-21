@@ -10,6 +10,7 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 ## Builds :
 - .NET 8.0
 - .NET Standard 2.0
+- .NET 40
 
 ## Features
 - Inject structured data (JSON format) directly into the application's binary.
@@ -34,6 +35,9 @@ The library is intended for advanced use cases such as proof-of-concept tools, b
 - .NET 6.0 SDK or later
 - Windows operating system
 - Write permissions on the application’s executable file
+
+## Dependencies
+- [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/) - For JSON serialization and deserialization.
 
 ## Usage
 | Method | Description |

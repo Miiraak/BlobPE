@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0;net40</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
 	<LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -12,9 +12,9 @@
     <Copyright>© 2025 Miiraak</Copyright>
     <RepositoryUrl>https://github.com/Miiraak/BlobPE</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>net; csharp; executable; self-modifying; binary; persistence; key-value; embedded-data; standalone; nuget-package</PackageTags>
-	<Version>1.1.1</Version>
-	<FileVersion>1.1.1</FileVersion>
+	<PackageTags>csharp; executable; self-modifying; persistence; key-value; embedded-data; pe-file; code-injection; binary-storage; standalone; blob; metadata</PackageTags>
+	<Version>1.1.2</Version>
+	<FileVersion>1.1.2</FileVersion>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -33,7 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="9.0.6" />
+    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="9.0.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
