@@ -1,7 +1,6 @@
 name: Nuget is Up-To-Date ?
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1' # Run weekly on Monday
   workflow_run:
@@ -23,7 +22,7 @@ jobs:
       - name: Extract version from BlobPE.csproj
         id: get_version
         run: |
-          VERSION=$(grep -m1 '<Version>' BlobPE.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
+          VERSION=$(grep -m1 '<Version>' BlobPE/BlobPE.csproj | sed -E 's/.*<Version>(.+)<\/Version>.*/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if version exists on GitHub Packages
