@@ -2,8 +2,6 @@ name: Nuget is Up-To-Date ?
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 1' # Run weekly on Monday
   workflow_run:
     workflows: ["Build & Publish Package"]
     types:
