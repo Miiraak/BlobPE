@@ -13,8 +13,8 @@
     <RepositoryUrl>https://github.com/Miiraak/BlobPE</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 	<PackageTags>csharp; executable; self-modifying; persistence; key-value; embedded-data; pe-file; code-injection; binary-storage; standalone; blob; metadata</PackageTags>
-	<Version>1.1.2</Version>
-	<FileVersion>1.1.2</FileVersion>
+	<Version>1.1.3</Version>
+	<FileVersion>1.1.3</FileVersion>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
